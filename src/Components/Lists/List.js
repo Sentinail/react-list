@@ -125,11 +125,15 @@ const ListCellStyle = styled.div`
         border: none;
         border-radius: 100px;
     }
+
+    & p {
+        max-width: 300px;
+    }
 `
 
 
 const ListCell = (props) => {
-    const {data, id, getListData} = props
+    const {data, id, done, getListData} = props
 
     const deleteItem = async () => {
         await axios.post("http://localhost:9000/list/remove", {
@@ -139,6 +143,16 @@ const ListCell = (props) => {
         getListData()
     }
 
+    const markItem = async () => {
+        await axios.patch("http://localhost:9000/list", {
+            listID: id,
+            isDone: !done
+        })
+
+        getListData()
+    }
+
+
     return (
         <ListCellStyle className='list-cell'>
             <p>
@@ -147,6 +161,7 @@ const ListCell = (props) => {
             <button onClick={() => {deleteItem()}}>
                 X
             </button>
+            <input type='checkbox' onClick={() => {markItem()}} onChange={() => {console.log("changed")}} checked={done}></input>
         </ListCellStyle>
     )
 }
@@ -190,7 +205,7 @@ function List() {
                     <button onClick={() => {addItem(inputRef.current)}}> Add To List </button>
                 </div>
                 <div className='lists'>
-                    {listData.length > 0 ? listData.map(data => {return <ListCell getListData={getListData} key={data.id} id={data.id} data={data.data}></ListCell>}) : null}
+                    {listData.length > 0 ? listData.map(data => {return <ListCell done={data.done} getListData={getListData} key={data.id} id={data.id} data={data.data}></ListCell>}) : null}
                 </div>
             </div>
 
